@@ -85,19 +85,6 @@ mac-cov: test ## Run the coverage report and display in a browser window (mac)
 # expects export TAG_NAME="dev/test/prod"
 # expects export OPS_REPOSITORY=""                                                        #
 #################################################################################
-cd: ## CD flow
-ifeq ($(TAG_NAME), test)
-cd: update-env
-	oc -n "$(OPENSHIFT_REPOSITORY)-tools" tag $(DOCKER_NAME):dev $(DOCKER_NAME):$(TAG_NAME)
-else ifeq ($(TAG_NAME), prod)
-cd: update-env
-	oc -n "$(OPENSHIFT_REPOSITORY)-tools" tag $(DOCKER_NAME):$(TAG_NAME) $(DOCKER_NAME):$(TAG_NAME)-$(shell date +%F)
-	oc -n "$(OPENSHIFT_REPOSITORY)-tools" tag $(DOCKER_NAME):test $(DOCKER_NAME):$(TAG_NAME)
-else
-TAG_NAME=dev
-cd: build update-env tag
-endif
-
 build: ## Build the docker container
 	docker build . -t $(DOCKER_NAME) \
 		--platform linux/amd64 \
