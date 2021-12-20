@@ -42,7 +42,7 @@ def run(call_back: Callable = None):
 
 class StandaloneApplication(gunicorn.app.base.BaseApplication):
 
-    def __init__(self, app, options=None):
+    def __init__(self, app, options=None, call_back=None):
         self.options = options or {}
         self.application = app
         super().__init__()
