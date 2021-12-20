@@ -77,13 +77,6 @@ mac-cov: test ## Run the coverage report and display in a browser window (mac)
 
 #################################################################################
 # COMMANDS - CD
-# expects the terminal to be openshift login
-# expects export OPENSHIFT_DOCKER_REGISTRY=""
-# expects export OPENSHIFT_SA_NAME="$(oc whoami)"
-# expects export OPENSHIFT_SA_TOKEN="$(oc whoami -t)"
-# expects export OPENSHIFT_REPOSITORY=""
-# expects export TAG_NAME="dev/test/prod"
-# expects export OPS_REPOSITORY=""                                                        #
 #################################################################################
 build: ## Build the docker container
 	docker build . -t $(DOCKER_NAME) \
