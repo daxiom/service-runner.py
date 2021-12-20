@@ -1,9 +1,5 @@
-Flask==2.0.2
-Jinja2==3.0.3
-MarkupSafe==2.0.1
-Werkzeug==2.0.2
-click==8.0.3
-gunicorn==20.1.0
-itsdangerous==2.0.1
-python-dotenv==0.19.2
+Flask
+Werkzeug
+gunicorn
+python-dotenv
 git+https://github.com/daxiom/simple-cloudevent.py.git@0.0.1
