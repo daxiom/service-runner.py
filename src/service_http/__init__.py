@@ -53,17 +53,17 @@ def create_app(env: str = None, call_back: Callable = default_call_back):
             # TODO: figure out if this should Panic or not
             return HTTPStatus.SERVICE_UNAVAILABLE
         
+        message_bytes = request_data
+        if isinstance(msg_dict := json.loads(request_data.decode('UTF8')), MutableMapping):
+            if msg_dict.get('subscription') and msg_dict.get('message'):
+                base64_bytes = msg_dict['message']['data']
+                message_bytes = base64.b64decode(base64_bytes)
+
         ce = alt = None
         try:
-            message_bytes = request_data
-            if isinstance(msg_dict := json.loads(request_data.decode('UTF8')), MutableMapping):
-                if msg_dict.get('subscription') and msg_dict.get('message'):
-                    base64_bytes = msg_dict['message']['data']
-                    message_bytes = base64.b64decode(base64_bytes)
-
             ce = from_queue_message(message_bytes)
         except (CloudEventVersionException, InvalidCloudEventError, ValueError) as e:
-            alt = request_data
+            alt = message_bytes.decode("utf-8").strip()
     
         app.logger.info('call back for ce:{ce}, alt {alt}'.format(ce=ce, alt=alt))
         rc = call_back(ce, alt)
