@@ -53,21 +53,27 @@ def create_app(env: str = None, call_back: Callable = default_call_back):
             # return a 200 so the message is removed from the queue
             return HTTPStatus.OK
 
-        if isinstance(pubsub_message, MutableMapping) \
-          and (raw_data := pubsub_message.get('data')) \
-          and (str_data := base64.b64decode(raw_data).decode("utf-8").strip()) \
-          and (data := json.loads(str_data)):
-            try:
-                ce = from_queue_message(data)
-            except (CloudEventVersionException, InvalidCloudEventError, ValueError, Exception) as e:
-                alt = data
-        else:
-            alt = pubsub_message
+        try:
+            ce = alt = None
+            if isinstance(pubsub_message, MutableMapping) \
+            and (raw_data := pubsub_message.get('data')) \
+            and (str_data := base64.b64decode(raw_data).decode("utf-8").strip()) \
+            and (data := json.loads(str_data)):
+                try:
+                    ce = from_queue_message(data)
+                except (CloudEventVersionException, InvalidCloudEventError, ValueError, Exception) as e:
+                    alt = data
+            else:
+                alt = pubsub_message
 
-        app.logger.info('call back for ce:{ce}, alt {alt}'.format(ce=ce, alt=alt))
-        rc = call_back(ce, alt)
-        app.logger.debug('call back returned:{rc} for ce:{ce}, alt {alt}'.format(rc=rc, ce=ce, alt=alt))
+            app.logger.info('call back for ce:{ce}, alt {alt}'.format(ce=ce, alt=alt))
+            rc = call_back(ce, alt)
+            app.logger.debug('call back returned:{rc} for ce:{ce}, alt {alt}'.format(rc=rc, ce=ce, alt=alt))
 
-        return {}, rc if ('rc' in locals()) else 200
+            return {}, rc if ('rc' in locals()) else 200
+        
+        except Exception as e:
+            app.logger.exception('exception in call back: %s', e)
+            return {}, HTTPStatus.INTERNAL_SERVER_ERROR
 
     return app
