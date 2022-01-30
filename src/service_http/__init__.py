@@ -46,6 +46,7 @@ def create_app(env: str = None, call_back: Callable = default_call_back):
             app.logger.error('no data in POST')
             # return OK so that the message is not re-queued
             return HTTPStatus.OK
+        app.logger.debug(f'raw message: {request_data}')
         
         if not (call_back := get_callback()):
             app.logger.error('no callback set')
